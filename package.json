@@ -1,0 +1,12 @@
+{
+  "name": "webpack-of-vue-doc",
+  "version": "1.0.0",
+  "description": "webpackforvue教程文档",
+  "scripts": {
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

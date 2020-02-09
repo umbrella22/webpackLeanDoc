@@ -7,7 +7,7 @@ The documentation source of [WebpackLearnOfVue](https://github.com/umbrella22/We
 
 ```bash
 # clone the project
-git clone https://github.com/umbrella22/WebpackLearnOfVue-site.git
+git clone https://github.com/umbrella22/webpackLeanDoc.git
 
 # install dependency
 npm install

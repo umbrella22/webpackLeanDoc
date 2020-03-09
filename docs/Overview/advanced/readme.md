@@ -282,6 +282,50 @@ npm install --save-dev hard-source-webpack-plugin 或 yarn add --dev hard-source
 ::: warning 提示
 在当前例子中，我已经默认添加该插件，所以大家可以不用重复操作哦。
 :::
+## 使用happypack让重构速度更上一层楼
+happypack是将任务分解成多个子进程让他们并发执行，之后将结果返回给子进程，由于js是单线程模型，每次webpack编译时都是一核有难多核围观，所以借助happypack能够迅速提升webpack的编译速度。
+首先我们安装它：
+```bash
+npm i -D happypack
+```
+然后在`webpack.base.js`文件中新增：
+```js
+const os = require("os")
+const HappyPack = require("happypack")
+// 设置进程池大小同当前cpu的核心数
+const HappyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length })
+// ...rules
+        {
+            test: /\.js$/,
+            // 此处是使用happypack中的loader去接管对js的操作其中id是指的是你happypack实例中的id
+            use: 'happypack/loader?id=HappyRendererBabel',
+            include: [resolve('src'), resolve('test'), resolve('node_modules/webpack-dev-server/client')]
+        },
+// ...插件位置
+        new HappyPack({
+            // 名称
+            id: 'HappyRendererBabel',
+            // 使用的loader，配置同rules中的配置这里是配置了babel-loader
+            loaders: [{
+                loader: 'babel-loader',
+                options: {
+                    cacheDirectory: true
+                }
+            }],
+            threadPool: HappyThreadPool
+        }),
+```
+::: warning 注意
+但是在对于url-loader和file-loader,happypack支持并不佳，所以不建议对这些loader进行使用，同样对于css而言也并不推荐，因为当你忘记共享进程池时，同样会导致编译缓慢。
+:::
+happypack中的参数
+- `id: Sting` 用唯一的标识符 id 来代表当前的 HappyPack 是用来处理一类特定的文件.
+- `loaders: Array`  用法和 webpack Loader 配置中一样.
+- `threads: Number` 代表开启几个子进程去处理这一类型的文件，默认是3个，类型必须是整数。
+- `verbose: Boolean` 是否允许 HappyPack 输出日志，默认是 `true`。
+- `threadPool: HappyThreadPool` 代表共享进程池，即多个 HappyPack 实例都使用同一个共享进程池中的子进程去处理任务，以防止资源占用过多。
+- `verboseWhenProfiling: Boolean` 开启`webpack --profile` ,仍然希望HappyPack产生输出。
+- `debug: Boolean` 启用debug 用于故障排查。默认 `false`。
 ## 关于cdn加速的一些建议
 > 随着需求越来越多，各种依赖库也越来越多，如果是跨平台应用还好，资源加载都在本地，不需要用户从我们服务器下载，但是，线上的站怎么办，我们的服务器带宽有限，压根就没法顾及这些，此时，cdn会给我们一些帮助，使用cdn可以将我们的一些依赖放在他们的服务器中分发，好处不言而喻，在去除了依赖库的情况下，我们的代码再加上进行了压缩，分包等一系列处理，不仅仅只是缩短了首屏启动的时间，那么现在来贴代码：
 ```JavaScript

@@ -4,17 +4,19 @@ agent:
   machine:
     type: e1-standard-2
     os_image: ubuntu1804
-
 blocks:
   - name: Test
     task:
       jobs:
-        - name: Test
+        - name: ''
           commands:
             - checkout
             - sem-version node 12
             - cache restore
             - npm install
-            - cache store
-            - npm run build --if-present
-            - npm test
+            - npm run build
+            - cd docs/.vuepress/dist
+            - git init
+            - git add -A
+            - git commit -m '自动更新'
+            - 'git push -f "https://${access_token}@github.com/umbrella22/WebpackLearnOfVue-site.git" master:gh-pages'

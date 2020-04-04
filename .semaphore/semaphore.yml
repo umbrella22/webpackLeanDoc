@@ -14,5 +14,5 @@ blocks:
             - sem-version node 12
             - cache restore
             - npm install
-            - npm run build
+            - 'npm run docs:build'
             - cd docs/.vuepress/dist

@@ -429,3 +429,38 @@ plugins: [
     ],
 ```
 然后我们重启一次webpack，就看到对应的效果了。其实还有更多的webpack的操作台输出插件，但是它们在win上表现非常差，所以我就不再介绍~
+
+## 自动上传已经打包好的代码
+> 很多时候，前端代码打包好了，都要自己手动去上传到服务器的对应目录，但针对linux的服务器，几乎很多前端是非常非常不愿意去碰的因为对命令的不熟悉，又或者不愿意去触碰那个只有黑洞洞的命令行窗口等一些原因，将上传这个工作甩手给了后端大佬，又或是运维大佬，但是他们又不懂前端，如果出现报错，或者环境问题，他们可能就直接告诉你，代码有问题，然后你排查了又没问题，很浪费时间。
+
+所以我将node-scp2这个包封装成webpack插件，利用它将我们打包好的文件上传到具有ssh的服务器中。使用非常便利。
+
+```bash
+npm i webpack-autoupload-plugin --save--dev
+```
+
+```JavaScript
+// 使用方法
+const AutoUploadPlugin = require("webpack-autoupload-plugin")
+
+plugins:[
+    new AutoUploadPlugin({
+        ip: '',
+        user: '',
+        password: '',
+        src: '',
+        dist: ''
+    })
+]
+```
+参数说明:
+
+参数|类型|说明
+--|:--:|--
+ip|String|您的服务器ip
+user|String|您的服务器登录用户名
+password|String|您的服务器登录密码
+src|String|需要上传的文件夹路径
+dist|String|服务器中的文件夹路径
+
+- 然后在你打包完成之后，该插件就会自动上传到你所设置的服务器地址啦，是不是相当的方便呢~
